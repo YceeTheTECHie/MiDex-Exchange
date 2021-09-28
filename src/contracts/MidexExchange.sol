@@ -18,6 +18,7 @@ contract MidexExchange {
     );
     function buyCoins() public payable {
         uint totalAmount = msg.value * rate;
+        require(token.balanceOf(address(this)) >= totalAmount);
         token.transfer(msg.sender,totalAmount);
         emit tokenPurchased(msg.sender,address(token),totalAmount,rate);
     } 
