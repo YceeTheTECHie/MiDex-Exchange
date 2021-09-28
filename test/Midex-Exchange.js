@@ -1,3 +1,4 @@
+
 const MidexExchange = artifacts.require('MidexExchange')
 const Token = artifacts.require('Token')
 
@@ -9,33 +10,51 @@ function tokens(n) {
   return web3.utils.toWei(n, 'ether');
 }
 
-contract('Midex-Exchange', (accounts) => {
-  let token, midexExchange
+contract('Midex-Exchange0', ([owner,customer]) => {
+    let token, midexExchange
 
-  before(async () => {
-    token = await Token.new()
-    midexExchange = await MidexExchange.new()
-    // Transfer all tokens to EthSwap (1 million)
-    await token.transfer(midexExchange.address, tokens('1000000'))
-  })
+    before(async () => {
+        token = await Token.new()
+        midexExchange = await MidexExchange.new(token.address)
+        // Transfer all tokens to EthSwap (1 million)
+        await token.transfer(midexExchange.address, tokens('1000000'))
+    })
 
-  describe('Token deployment', async () => {
-    it('contract has a name', async () => {
-      const name = await token.name()
-      assert.equal(name, 'Token')
+    describe('Token contract was  deployment', async () => {
+        it('contract has a name', async () => {
+            const name = await token.name()
+            assert.equal(name, 'Token')
+        })
+    })
+    describe('MidexExchange was deployment', async () => {
+        it('contract has a name', async () => {
+            const name = await midexExchange.name()
+            assert.equal(name, 'Midex Exchange')
+        })
+
+            it('contract has tokens', async () => {
+              let balance = await token.balanceOf(midexExchange.address)
+              assert.equal(balance.toString(), tokens('1000000'))
+            })
+    })
+     describe('BuyCoin()', async () => {
+        before(async () => {
+           let result = await midexExchange.buyCoins({from: customer, value: web3.utils.toWei('1','ether') })
+        })
+        
+    it('Customer received the payment', async () => {
+        let customerBalance = await token.balanceOf(customer);
+        let deployerBalance = await token.balanceOf(midexExchange.address);
+        assert.equal(customerBalance.toString(), tokens('100'));
+        assert.equal(deployerBalance.toString(), tokens('999900'));
+
+    })
+         
+     it('Total supply of token reduces by 1', async () => {
+        let deployerBalance = await token.balanceOf(midexExchange.address);
+        assert.equal(deployerBalance.toString(), tokens('999900'));
+
     })
   })
 
-  describe('MidexExchange deployment', async () => {
-    it('contract has a name', async () => {
-      const name = await midexExchange.name()
-      assert.equal(name, 'Midex Exchange')
     })
-
-    it('contract has tokens', async () => {
-      let balance = await token.balanceOf(midexExchange.address)
-      assert.equal(balance.toString(), tokens('1000000'))
-    })
-  })
-
-})

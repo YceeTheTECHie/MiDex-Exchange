@@ -5,7 +5,7 @@ module.exports = async function (deployer,network,accounts) {
    await deployer.deploy(Token);
    const token = await Token.deployed();
 
-   await deployer.deploy(MidexExchange);
+   await deployer.deploy(MidexExchange,token.address)   ;
    const midexExchange = await MidexExchange.deployed();
 
  
