@@ -9,8 +9,16 @@ contract MidexExchange {
         token = _token;
     }
 
+    event tokenPurchased(
+        address account,
+        address token,
+        uint256 amount,
+        uint256 rate
+
+    );
     function buyCoins() public payable {
         uint totalAmount = msg.value * rate;
         token.transfer(msg.sender,totalAmount);
+        emit tokenPurchased(msg.sender,address(token),totalAmount,rate);
     } 
 }

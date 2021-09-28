@@ -37,9 +37,10 @@ contract('Midex-Exchange0', ([owner,customer]) => {
               assert.equal(balance.toString(), tokens('1000000'))
             })
     })
-     describe('BuyCoin()', async () => {
+    describe('BuyCoin()', async () => {
+         let result 
         before(async () => {
-           let result = await midexExchange.buyCoins({from: customer, value: web3.utils.toWei('1','ether') })
+            result = await midexExchange.buyCoins({from: customer, value: web3.utils.toWei('1','ether') })
         })
         
     it('Customer received the payment', async () => {
@@ -48,13 +49,29 @@ contract('Midex-Exchange0', ([owner,customer]) => {
         assert.equal(customerBalance.toString(), tokens('100'));
         assert.equal(deployerBalance.toString(), tokens('999900'));
 
+
     })
+        
          
      it('Total supply of token reduces by 1', async () => {
         let deployerBalance = await token.balanceOf(midexExchange.address);
-        assert.equal(deployerBalance.toString(), tokens('999900'));
+         assert.equal(deployerBalance.toString(), tokens('999900'));
+
+     })
+        
+    it('Token Purchased event returns correct events', async () => {
+        const events = result.logs[0].args;
+        console.log(events);
+        assert.equal(events.account, customer);
+        assert.equal(events.token, token.address);
+        assert.equal(events.amount.toString(), tokens('100'));
+        assert.equal(events.rate.toString(), '100');
+
+
+
 
     })
+        
   })
 
     })
