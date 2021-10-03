@@ -22,4 +22,10 @@ contract MidexExchange {
         token.transfer(msg.sender,totalAmount);
         emit tokenPurchased(msg.sender,address(token),totalAmount,rate);
     } 
+
+    function sellCoins(uint _amount) public payable {
+       uint ethAmount = _amount / rate;
+       token.transferFrom(msg.sender, address(this), _amount);
+       msg.sender.transfer(ethAmount);
+    }
 }
